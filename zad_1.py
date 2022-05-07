@@ -2,27 +2,28 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
-import scipy.ndimage as ndimage
+sensitivity = 0.05
 
-sensitivity = 5
-
-galia = np.array(Image.open("Lab9_galia.png"))
+galia = np.array(Image.open("Lab9_galia.png").convert('L'))
 galia = 255-galia
-imp = np.array(Image.open("Lab9_galia_e.png"))
+imp = np.array(Image.open("Lab9_galia_e.png").convert('L'))
 imp = 255-imp
 
-C = np.real(np.fft.ifft2(np.fft.fft2(rgb2gray(galia)) * np.fft.fft2(np.rot90(rgb2gray(imp), 2), (463, 953))))
+plt.imshow(galia, cmap='Greys')
+plt.show()
+plt.imshow(imp, cmap='Greys')
+plt.show()
 
-#https://stackoverflow.com/questions/9111711/get-coordinates-of-local-maxima-in-2d-array-above-certain-value
+C = np.real(np.fft.ifft2(np.fft.fft2(galia) * np.fft.fft2(np.rot90(imp, 2), (463, 953))))
 
-indices = np.nonzero(C > np.amax(C)-sensitivity)
+indices = np.nonzero(C > np.amax(C)*(1-sensitivity))
 x, y = [], []
 for i in range(len(indices[0])):
     y.append(indices[0][i])
     x.append(indices[1][i])
 
 
-plt.imshow(galia)
+plt.imshow(galia, cmap='Greys')
 plt.plot(x,y, 'ro')
 
 plt.show()
