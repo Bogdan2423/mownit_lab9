@@ -3,6 +3,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import string
 
+from skimage.feature import peak_local_max
+
 sensitivity = 0.01
 letter_size = 0.50
 
@@ -39,20 +41,13 @@ for l in letters:
 
     C = np.real(np.fft.ifft2(np.fft.fft2(text) * np.fft.fft2(np.rot90(letter, 2), text.shape)))
 
+    coordinates = peak_local_max(C, min_distance=10, threshold_rel=0.99)
 
-    indices = np.nonzero(C >= (1-sensitivity)*np.amax(C))
-
-    for i in range(len(indices[0])):
-        letter_coords.append((indices[0][i], indices[1][i], l))
-
-    x, y = [], []
-    for i in range(len(indices[0])):
-        y.append(indices[0][i])
-        x.append(indices[1][i])
-
+    for i in range(len(coordinates)):
+        letter_coords.append((coordinates[i][1], coordinates[i][0], l))
 
     plt.imshow(text, cmap='Greys')
-    plt.plot(x,y, 'ro')
+    plt.plot(coordinates[:, 1], coordinates[:, 0], 'r.')
     plt.show()
 
 

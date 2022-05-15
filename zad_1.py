@@ -1,8 +1,9 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+from scipy import ndimage
+from skimage.feature import peak_local_max
 
-sensitivity = 0.05
 
 galia = np.array(Image.open("Lab9_galia.png").convert('L'))
 galia = 255-galia
@@ -11,43 +12,30 @@ imp = 255-imp
 
 C = np.real(np.fft.ifft2(np.fft.fft2(galia) * np.fft.fft2(np.rot90(imp, 2), galia.shape)))
 
-indices = np.nonzero(C > np.amax(C)*(1-sensitivity))
-x, y = [], []
-for i in range(len(indices[0])):
-    y.append(indices[0][i])
-    x.append(indices[1][i])
-
-letter_num = len(x)
+coordinates = peak_local_max(C, min_distance=20, threshold_rel=0.96)
 
 plt.imshow(galia, cmap='Greys')
-plt.plot(x,y, 'ro')
-
+plt.plot(coordinates[:, 1], coordinates[:, 0], 'r.')
 plt.show()
 
 
-sensitivity = 0.20
+letter_num = len(coordinates)
+
 
 school_img = Image.open("Lab9_school.jpg").convert('L')
 school = np.array(school_img)
 fish_img = school_img.crop((227, 296, 250, 320))
 fish = np.array(fish_img)
 
-plt.imshow(school, cmap='Greys')
-plt.show()
-plt.imshow(fish, cmap='Greys')
-plt.show()
-
 C = np.real(np.fft.ifft2(np.fft.fft2(school) * np.fft.fft2(np.rot90(fish, 2), school.shape)))
 
-indices = np.nonzero(C > np.amax(C)*(1-sensitivity))
-x, y = [], []
-for i in range(len(indices[0])):
-    y.append(indices[0][i])
-    x.append(indices[1][i])
-
-fish_num = len(x)
+coordinates = peak_local_max(C, min_distance=10, threshold_rel=0.70)
 
 plt.imshow(school, cmap='Greys')
-plt.plot(x,y, 'ro')
-
+plt.plot(coordinates[:, 1], coordinates[:, 0], 'r.')
 plt.show()
+
+fish_num = len(coordinates)
+
+print("Number of letters \'e\':",letter_num)
+print("Number of fish:",fish_num)
