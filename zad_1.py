@@ -1,7 +1,6 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-from scipy import ndimage
 from skimage.feature import peak_local_max
 
 
@@ -24,7 +23,7 @@ letter_num = len(coordinates)
 
 school_img = Image.open("Lab9_school.jpg").convert('L')
 school = np.array(school_img)
-fish_img = school_img.crop((227, 296, 250, 320))
+fish_img = Image.open("Lab9_fish1.png").convert('L')
 fish = np.array(fish_img)
 
 C = np.real(np.fft.ifft2(np.fft.fft2(school) * np.fft.fft2(np.rot90(fish, 2), school.shape)))
